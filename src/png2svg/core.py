@@ -5,9 +5,14 @@ import svg
 
 def conversion_pix_to_hexa(x,y):
     return ((int)(2*x/3),(int)((-np.sqrt(3)/3)*y+x/3))
+
+def isinHExagon(pos,center,width_hexagon,height_hexagon):
+    x,y=abs(pos[0]-center[0]),abs(pos[1]-center[1])
+    # print(height_hexagon,height_hexagon*(1-(x-width_hexagon/2)/width_hexagon))
+    return y<min(height_hexagon,height_hexagon*(1-(x-width_hexagon/2)/width_hexagon))
 def avg_col(L):
 
-    if isinstance(L[0], list):
+    if isinstance(L[0], tuple):
         sum_r,sum_g,sum_b = 0,0,0
         for ele in L:
             sum_r+=ele[0]/len(ele)
@@ -54,12 +59,22 @@ def png2svg(source_image,output_file,size):
                 List_centers[i,j,0]=(2*i+1)*height_hexagon
                 List_centers[i,j,1]=(2*j+1)*width_hexagon
 
+    for i in range(nbr_lines):
+        for j in range(nbr_col):
+            if (i,j) not in Dict_color:
+                Dict_color[(i,j)] =[]
+
     for i in range(width):
         for j in range(height):
-            if conversion_pix_to_hexa(i,j) not in Dict_color:
-                Dict_color[conversion_pix_to_hexa(i,j)] =[]
-            Dict_color[conversion_pix_to_hexa(i,j)].append(image.getpixel(conversion_pix_to_hexa(i,j)))
+
+                for center in Dict_color:
+                    if isinHExagon((i,j),center,width_hexagon,height_hexagon):
+                        Dict_color[center].append(image.getpixel((i,j)))
+        # print(i)
+
+
     for ele in Dict_color:
+        print(isinstance(Dict_color[ele],list))
         Dict_color[ele]=avg_col(Dict_color[ele])
     print("Dict_color:\n")
     print(Dict_color)
@@ -87,4 +102,4 @@ def png2svg(source_image,output_file,size):
         # f.write('<polygon fill="red" stroke="rgb(1,1,1)" stroke-width="10" points="350,75  379,161 469,161 397,215 423,301 350,250 277,301 303,215 231,161 321,161" />')
         f.write('</svg>')
 print([1,2]+[3,4])
-png2svg("img/test.jpg","",5)
+png2svg("img/screenshot.jpg","",50)
