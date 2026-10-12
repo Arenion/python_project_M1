@@ -6,12 +6,20 @@ import svg
 def conversion_pix_to_hexa(x,y):
     return ((int)(2*x/3),(int)((-np.sqrt(3)/3)*y+x/3))
 def avg_col(L):
-    sum_r,sum_g,sum_b = 0,0,0
-    for ele in L:
-        sum_r+=ele[0]/len(ele)
-        sum_g+=ele[1]/len(ele)
-        sum_b+=ele[2]/len(ele)
-    return (int(sum_r),int(sum_g),int(sum_b))
+
+    if isinstance(L[0], list):
+        sum_r,sum_g,sum_b = 0,0,0
+        for ele in L:
+            sum_r+=ele[0]/len(ele)
+            sum_g+=ele[1]/len(ele)
+            sum_b+=ele[2]/len(ele)
+        return (int(sum_r),int(sum_g),int(sum_b))
+    else:
+        sum= 0
+        for ele in L:
+            sum+=ele
+        return (int(sum),int(sum),int(sum))
+
 def hexagon(height_hexagon,width_hexagon,flattop,center):
     Points=""
     Points+=str(center[0]+width_hexagon/2)+","+str(center[1]+height_hexagon)+" "
@@ -53,10 +61,18 @@ def png2svg(source_image,output_file,size):
             Dict_color[conversion_pix_to_hexa(i,j)].append(image.getpixel(conversion_pix_to_hexa(i,j)))
     for ele in Dict_color:
         Dict_color[ele]=avg_col(Dict_color[ele])
-    # print(Dict_color)
+    print("Dict_color:\n")
+    print(Dict_color)
+    print("List_Center:\n")
+    print(List_centers)
+    print("Dimensions:")
+    print(len(Dict_color))
+    print(len(List_centers))
+    print(width)
+    print(height)
     with open('output.svg','w') as f:
         f.write('<?xml version="1.0" standalone="no"?>\n')
-        f.write('<svg width="12cm" height="4cm" viewBox="0 0 1200 400"\n')
+        f.write('<svg width="4cm" height="4cm" viewBox="0 0 1200 400"\n')
         f.write('xmlns="http://www.w3.org/2000/svg" version="1.1">\n')
         f.write('<desc>Hexago output</desc>\n')
         for i in range(nbr_lines):
@@ -71,4 +87,4 @@ def png2svg(source_image,output_file,size):
         # f.write('<polygon fill="red" stroke="rgb(1,1,1)" stroke-width="10" points="350,75  379,161 469,161 397,215 423,301 350,250 277,301 303,215 231,161 321,161" />')
         f.write('</svg>')
 print([1,2]+[3,4])
-png2svg("img/screenshot.jpg","",5)
+png2svg("img/test.jpg","",5)
