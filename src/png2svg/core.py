@@ -1,7 +1,6 @@
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-import svg
 
 def conversion_pix_to_hexa(x,y):
     return ((int)(2*x/3),(int)((-np.sqrt(3)/3)*y+x/3))
@@ -29,39 +28,55 @@ def avg_col(L):
 
 def hexagon(height_hexagon,width_hexagon,flattop,center):
     Points=""
-    Points+=str(center[0]+width_hexagon/2)+","+str(center[1]+height_hexagon)+" "
-    Points+=str(center[0]+width_hexagon)+","+str(center[1])+" "
-    Points+=str(center[0]+width_hexagon/2)+","+str(center[1]-height_hexagon)+" "
-    Points+=str(center[0]-width_hexagon/2)+","+str(center[1]-height_hexagon)+" "
-    Points+=str(center[0]-width_hexagon)+","+str(center[1])+" "
-    Points+=str(center[0]-width_hexagon/2)+","+str(center[1]+height_hexagon)+" "
+    if flattop:
+        Points+=str(center[0]+width_hexagon/2)+","+str(center[1]+height_hexagon)+" "
+        Points+=str(center[0]+width_hexagon)+","+str(center[1])+" "
+        Points+=str(center[0]+width_hexagon/2)+","+str(center[1]-height_hexagon)+" "
+        Points+=str(center[0]-width_hexagon/2)+","+str(center[1]-height_hexagon)+" "
+        Points+=str(center[0]-width_hexagon)+","+str(center[1])+" "
+        Points+=str(center[0]-width_hexagon/2)+","+str(center[1]+height_hexagon)+" "
+    else:
+        Points+=str(center[0]+width_hexagon)+","+str(center[1]+height_hexagon/2)+" "
+        Points+=str(center[0])+","+str(center[1]+height_hexagon)+" "
+        Points+=str(center[0]-width_hexagon)+","+str(center[1]+height_hexagon/2)+" "
+        Points+=str(center[0]-width_hexagon)+","+str(center[1]-height_hexagon/2)+" "
+        Points+=str(center[0])+","+str(center[1]-height_hexagon)+" "
+        Points+=str(center[0]+width_hexagon)+","+str(center[1]-height_hexagon/2)+" "
 
     return(Points)
 def isinimage(point,size):
     return(int(point[0])>=0 and int(point[0])<=size[0] and int(point[1])>=0 and int(point[1])<size[1])
-def png2svg(source_image,output_file,size):
+def png2svg(source_image,output_file,size,flattop=True):
     image = Image.open(source_image)
     width,height =image.size
-    plt.imshow(image)
-    print(width)
-    print(height)
-    height_hexagon=np.sqrt(3)*size/2
-    width_hexagon=size
+    if flattop:
+        height_hexagon=np.sqrt(3)*size/2
+        width_hexagon=size
+    else:
+        height_hexagon=size
+        width_hexagon=np.sqrt(3)*size/2
     nbr_col = (int) (width/(2*width_hexagon))
     nbr_lines = (int) (height/(2*height_hexagon))
     #taille de l'image en coordonnées hexagonales
-    print(nbr_col)
-    print(nbr_lines)
+
     Dict_color={}#we will put all the average colors in a single dictionary
     List_centers=np.zeros((nbr_col,nbr_lines,2))#array of the centers of the hexagons: the i,j correspond to the coordinates in hexagons and the value associated in the traditional coordinates
     for i in range(nbr_col):
         for j in range(nbr_lines):
-            if i%2==1:
-                List_centers[i,j,0]=(2*i+1)*height_hexagon
-                List_centers[i,j,1]=(2*(j+1))*width_hexagon
+            if flattop:
+                if i%2==1:
+                    List_centers[i,j,0]=(2*i+1)*height_hexagon
+                    List_centers[i,j,1]=(2*(j+1))*width_hexagon
+                else:
+                    List_centers[i,j,0]=(2*i+1)*height_hexagon
+                    List_centers[i,j,1]=(2*j+1)*width_hexagon
             else:
-                List_centers[i,j,0]=(2*i+1)*height_hexagon
-                List_centers[i,j,1]=(2*j+1)*width_hexagon
+                if j%2==1:
+                    List_centers[i,j,0]=(2*(i+1))*width_hexagon
+                    List_centers[i,j,1]=(2*j+1)*height_hexagon
+                else:
+                    List_centers[i,j,0]=(2*i+1)*width_hexagon
+                    List_centers[i,j,1]=(2*j+1)*height_hexagon
 
     for i in range(nbr_col):
         for j in range(nbr_lines):
@@ -76,16 +91,7 @@ def png2svg(source_image,output_file,size):
     for ele in Dict_color:
         if Dict_color[ele]:
             Dict_color[ele]=avg_col(Dict_color[ele])
-    print("Dict_color:\n")
-    print(Dict_color)
-    print("List_Center:\n")
-    print(List_centers)
-    print("Dimensions:")
-    print(len(Dict_color))
-    print(len(List_centers))
-    print(width)
-    print(height)
-    with open('output.svg','w') as f:
+    with open(output_file,'w') as f:
         f.write('<?xml version="1.0" standalone="no"?>\n')
         f.write('<svg width="4cm" height="4cm" viewBox="0 0 1200 400"\n')
         f.write('xmlns="http://www.w3.org/2000/svg" version="1.1">\n')
@@ -99,7 +105,5 @@ def png2svg(source_image,output_file,size):
                                 color= Dict_color[(i,j)]
                         else:
                             color = (0,0,0)
-                        f.write('<polygon fill="rgb('+str(color[0])+','+str(color[1])+','+str(color[2])+')" stroke="transparent" stroke_width="1" \n'+'points="'+hexagon(height_hexagon,width_hexagon,True,center)+'"'+"/>\n")
+                        f.write('<polygon fill="rgb('+str(color[0])+','+str(color[1])+','+str(color[2])+')" stroke="transparent" stroke_width="0.1" \n'+'points="'+hexagon(height_hexagon,width_hexagon,flattop,center)+'"'+"/>\n")
         f.write('</svg>')
-print([1,2]+[3,4])
-png2svg("img/screenshot.jpg","",30)

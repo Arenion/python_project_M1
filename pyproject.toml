@@ -1,5 +1,5 @@
 [project]
-name = "project"
+name = "png2svg"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -7,10 +7,17 @@ authors = [
     { name = "Arenion", email = "nicolas.michel.vannereux@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.4",
+    "pillow>=12.3.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/png2svg"]
 
 [project.scripts]
-project = "project:main"
+png2svg = "png2svg:main"
 
 [build-system]
 requires = ["uv_build>=0.12.17,<0.13.0"]
