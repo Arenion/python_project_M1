@@ -100,7 +100,6 @@ def png2svg(source_image,output_file,size):
                         else:
                             color = (0,0,0)
                         f.write('<polygon fill="rgb('+str(color[0])+','+str(color[1])+','+str(color[2])+')" stroke="transparent" stroke_width="1" \n'+'points="'+hexagon(height_hexagon,width_hexagon,True,center)+'"'+"/>\n")
-        # f.write('<polygon fill="red" stroke="rgb(1,1,1)" stroke-width="10" points="350,75  379,161 469,161 397,215 423,301 350,250 277,301 303,215 231,161 321,161" />')
         f.write('</svg>')
 print([1,2]+[3,4])
 png2svg("img/screenshot.jpg","",30)
